@@ -7,7 +7,7 @@ let inline flatten (A:'a[,]) = A |> Seq.cast<'a>
 let inline getColumn c (A:_[,]) = flatten A.[*,c..c] |> Seq.toArray
 let inline getRow r (A:_[,]) = flatten A.[r..r,*] |> Seq.toArray
 ///
-/// Many thanks to Tomas Petricek
+/// Many thanks to Tomas Petricek posting code on SO
 ///
 let rec repeat items =
   seq { yield! items
@@ -16,7 +16,7 @@ let rec repeat items =
 let stopWatch = System.Diagnostics.Stopwatch()
 stopWatch.Start()
 //
-// DAY 3 ??
+// DAY 3 :38.03
 //
 
 let translateLine (line:string):int[] =
@@ -34,28 +34,34 @@ let columns=Seq.initInfinite(fun i->
         x|>Seq.skip i|>Seq.head
         )|>Seq.toList
     )
-let originalColumns=columns
-let processColumn(downIndex,column) =
+let processColumn(downIndex,column):list<int> =
     let ret=column|>List.mapi(fun i x->
-        if i=downIndex+1 then x+2 else x
+        if i+1=downIndex then x+2 else x
         )
     ret
-let nextMove=(3,1)//seq{while true do yield (1,1)}
-let processAMove(cols,iCount) =
-    cols
-    |> Seq.skip (fst nextMove*iCount)
-    |>Seq.truncate (fst nextMove)
+let movementSteps=seq{(1,1);(3,1);(5,1);(7,1);(1,2)}
+let processAMove((mv:(int*int)),(iCount:ref<int>)) =
+    let ic=(!iCount)
+    columns
+    |> Seq.skip (fst mv*ic)
+    |>Seq.truncate (fst mv)
     |>Seq.mapi(fun i x->
-        let di=(snd nextMove*iCount)
-        if i<>(fst nextMove-1) then x else processColumn(di,x)
+        match (fst mv*(!iCount-1)+i) with
+            |0->
+                iCount:=(!iCount+1)
+                x
+            |_->
+                let di=1+(snd mv*(!iCount-1))
+                if i<>(fst mv-1) then x else processColumn(di,x)
         )
     |>Seq.toList
 
 let printHill(samp:int [,] ) =
     //[0..(samp.[*,0]).Length-1]
-    [1..samp|>Array2D.length2]
-    |>List.iteri(fun i x->
-        samp.[*,i]
+    [0..10]//  samp|>Array2D.length2]
+    |>List.iter(fun x->
+        let sampleSack=Math.Min(10,samp|>Array2D.length2)
+        samp.[0..sampleSack,x]
         |> Array.iter(fun y->
             let c=
                 match y with
@@ -66,58 +72,57 @@ let printHill(samp:int [,] ) =
             printf "%s " c)
         printfn ""
         )
-let foo:list<int>=
-    let thisCol=columns|>Seq.head
-    processColumn((-1),thisCol)
-let bar:list<list<int>>=[foo]
-let bell:seq<list<list<int>>>=seq{bar}
 
 [<EntryPoint>]
 let main argv =
     printfn "Advent of Code Puzzle Output"
     printfn "Day 2"
 
-    
-    let mutable index=(-1)
-    let totalMoves = seq{
-        //yield processAMove(columns, 1);
-        //yield bar;
-        yield [foo]
-        let newcol=(columns|>Seq.skip 1)
-        while (snd nextMove*index)<(rowGenerators.Length)
+    let originalColumns=columns
+    let totalMoves(mv:(int*int)) = seq{
+        let index= ref 1
+        let dog=fst mv
+        while (snd mv*(!index))<(rowGenerators.Length)
             do
-            index<-index+1
-            yield processAMove(newcol,index)
+            index:=!index+1
+            yield processAMove(mv,ref (!index-1))
     }
+    let totals=
+        movementSteps |> Seq.mapi(fun ii mv->
+            let samp4=totalMoves(mv)|>Seq.concat
+            let samp42D=array2D samp4
 
-    let samp4=totalMoves|>Seq.concat
-    //let samp4arr=array2D samp4
-    let samp42D=array2D samp4
-    //let samp42D=flipArray(samp4arr)
-    let origArrayCols=originalColumns|>Seq.take samp42D.[0,*].Length
-    let origHill=array2D origArrayCols
-    let boo(samp:int [,]) =
-        [0..(samp.[*,0]).Length-1]
-        |>List.mapi(fun i x->
-            origHill.[*,1]
-        )
-    printHill(origHill)
-    printfn ""
-    printfn ""
-    printfn ""
-    printHill(flipArray (flipArray samp42D))
-    printfn ""
-    printfn ""
-    printfn ""
-    let mop=samp42D |> Seq.cast<int>|>Seq.toArray
-    printfn "asdf %A" (mop.Length)
-    let bop=mop|>Array.filter(fun x->x=3)
-    printfn "TOTAL TREES HIT %A" (bop.Length) // (boo |> Seq.length)
-    printfn ""
-    printfn ""
+            let origArrayCols=originalColumns|>Seq.take samp42D.[0,*].Length
+            let origHill=array2D origArrayCols
 
-    printfn ""
+            printfn "%s." (string (ii+1))
+            printHill(origHill)
+            printfn ""
+            printfn "         ---"
+            printfn ""
 
+            let fixedArray:int[,]=samp42D
+            printHill(fixedArray)
+
+            printfn ""
+            printfn "------------------------------"
+            let mop=samp42D |> Seq.cast<int>|>Seq.toArray
+            printfn "Solution %s Tree Count %A" (mv.ToString()) (mop.Length)
+            let bop=mop|>Array.filter(fun x->x=3)
+            printfn "Rows: %s Cols: %s" (string (fixedArray |> Array2D.length1)) (string (fixedArray |> Array2D.length2))
+            printfn "TOTAL TREES HIT %A" (bop.Length) // (boo |> Seq.length)
+            printfn "------------------------------"
+            printfn ""
+            bop.Length
+        ) |> Seq.toList
+    let grandTotal = totals |> List.sum
+    let grandMult = totals |> Seq.reduce(fun x y->x*y)
+    printfn ""
+    printfn "######################3"
+    printfn "TOTAL TREES %A" grandTotal
+    printfn "TOTAL PRODUCT OFTREES %A" grandMult
+    printfn "######################3"
+    printfn ""
     let ts=stopWatch.Elapsed
     let elapsedTime =
         String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
