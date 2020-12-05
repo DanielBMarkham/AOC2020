@@ -19,110 +19,153 @@ stopWatch.Start()
 // DAY 3 :38.03
 //
 
-let translateLine (line:string):int[] =
-    line.ToCharArray()|>Array.map(fun x->if x='.' then 0 else 1)
-let translateGenerators (dat:string list) =
-    dat|>List.map (translateLine)
-let rowGenerators =
-    let t=part1Data |> translateGenerators
-    t|>List.map repeat
 
 
-let columns=Seq.initInfinite(fun i->
-    //rowGeneratorArray|>Seq.map(fun x->
-    rowGenerators|>Seq.map(fun x->
-        x|>Seq.skip i|>Seq.head
-        )|>Seq.toList
-    )
-let processColumn(downIndex,column):list<int> =
-    let ret=column|>List.mapi(fun i x->
-        if i+1=downIndex then x+2 else x
-        )
-    ret
-let movementSteps=seq{(1,1);(3,1);(5,1);(7,1);(1,2)}
-let processAMove((mv:(int*int)),(iCount:ref<int>)) =
-    let ic=(!iCount)
-    columns
-    |> Seq.skip (fst mv*ic)
-    |>Seq.truncate (fst mv)
-    |>Seq.mapi(fun i x->
-        match (fst mv*(!iCount-1)+i) with
-            |0->
-                iCount:=(!iCount+1)
-                x
-            |_->
-                let di=1+(snd mv*(!iCount-1))
-                if i<>(fst mv-1) then x else processColumn(di,x)
-        )
-    |>Seq.toList
 
-let printHill(samp:int [,] ) =
-    //[0..(samp.[*,0]).Length-1]
-    [0..10]//  samp|>Array2D.length2]
-    |>List.iter(fun x->
-        let sampleSack=Math.Min(10,samp|>Array2D.length2)
-        samp.[0..sampleSack,x]
-        |> Array.iter(fun y->
-            let c=
-                match y with
-                    |0->"."
-                    |1->"#"
-                    |2->"O"
-                    |3->"X"
-            printf "%s " c)
-        printfn ""
-        )
+
+let initArray x y = part1Data.[x].Substring(y,1)
+let inline addTuples (a,b) (c,d)=(a+c,b+d)
+let mountainArray=Array2D.init part1Data.Length part1Data.[0].Length initArray
+let inline move (previousPosition:int*int) (move:int*int) (mountainArr:string [,]):int*int=addTuples previousPosition move
+let inline checkForTree(position:int*int,mountain:string [,]):int = 
+    let mountainLine = mountain.[*,snd position]
+    printfn "%A" position
+    printfn "%A" mountainLine 
+    if mountain.[fst position,snd position]="#" then 1 else 0
+let initialPosition=(0,0)
+let rec skiMoves (mv:int*int) (position:int*int) (mountainArr:string[,]) (treeCount:int)=
+  let newPosition=move position mv mountainArr
+  match newPosition with
+    |(_,y) when y>part1Data.[0].Length->treeCount
+      // let newMountain=mountainArray
+      // let newY=y-part1Data.[0].Length
+      // let newPos=(x,newY)
+      // skiMoves mv newPos mountainArr (treeCount+checkForTree newPos mountainArr)
+    |(x,y) when x>part1Data.Length->
+      let newMountain=mountainArray
+      let newX=x-part1Data.Length
+      let newPos=(newX,y)
+      skiMoves mv newPos mountainArr (treeCount+checkForTree(newPos,mountainArr))
+    |(_,_)->skiMoves newPosition mv mountainArr (treeCount+checkForTree(newPosition,mountainArr))
+
+
+
+
+
+
+
+
+
+
+
+
+
+// let translateLine (line:string):int[] =
+//     line.ToCharArray()|>Array.map(fun x->if x='.' then 0 else 1)
+// let translateGenerators (dat:string list) =
+//     dat|>List.map (translateLine)
+// let rowGenerators =
+//     let t=part1Data |> translateGenerators
+//     t|>List.map repeat
+
+
+// let columns=Seq.initInfinite(fun i->
+//     //rowGeneratorArray|>Seq.map(fun x->
+//     rowGenerators|>Seq.map(fun x->
+//         x|>Seq.skip i|>Seq.head
+//         )|>Seq.toList
+//     )
+// let processColumn(downIndex,column):list<int> =
+//     let ret=column|>List.mapi(fun i x->
+//         if i+1=downIndex then x+2 else x
+//         )
+//     ret
+// let movementSteps=seq{(1,1);(3,1);(5,1);(7,1);(1,2)}
+// let processAMove((mv:(int*int)),(iCount:ref<int>)) =
+//     let ic=(!iCount)
+//     columns
+//     |> Seq.skip (fst mv*ic)
+//     |>Seq.truncate (fst mv)
+//     |>Seq.mapi(fun i x->
+//         match (fst mv*(!iCount-1)+i) with
+//             |0->
+//                 iCount:=(!iCount+1)
+//                 x
+//             |_->
+//                 let di=1+(snd mv*(!iCount-1))
+//                 if i<>(fst mv-1) then x else processColumn(di,x)
+//         )
+//     |>Seq.toList
+
+// let printHill(samp:int [,] ) =
+//     //[0..(samp.[*,0]).Length-1]
+//     [0..10]//  samp|>Array2D.length2]
+//     |>List.iter(fun x->
+//         let sampleSack=Math.Min(10,samp|>Array2D.length2)
+//         samp.[0..sampleSack,x]
+//         |> Array.iter(fun y->
+//             let c=
+//                 match y with
+//                     |0->"."
+//                     |1->"#"
+//                     |2->"O"
+//                     |3->"X"
+//             printf "%s " c)
+//         printfn ""
+//         )
 
 [<EntryPoint>]
 let main argv =
     printfn "Advent of Code Puzzle Output"
     printfn "Day 2"
+    let movementSteps=seq{(1,1);(3,1);(5,1);(7,1);(1,2)}
+    let ans=skiMoves (3,1) (0,0) mountainArray 0
+    printfn "%A" ans
+    // let originalColumns=columns
+    // let totalMoves(mv:(int*int)) = seq{
+    //     let index= ref 1
+    //     let dog=fst mv
+    //     while (snd mv*(!index))<(rowGenerators.Length)
+    //         do
+    //         index:=!index+1
+    //         yield processAMove(mv,ref (!index-1))
+    // }
+    // let totals=
+    //     movementSteps |> Seq.mapi(fun ii mv->
+    //         let samp4=totalMoves(mv)|>Seq.concat
+    //         let samp42D=array2D samp4
 
-    let originalColumns=columns
-    let totalMoves(mv:(int*int)) = seq{
-        let index= ref 1
-        let dog=fst mv
-        while (snd mv*(!index))<(rowGenerators.Length)
-            do
-            index:=!index+1
-            yield processAMove(mv,ref (!index-1))
-    }
-    let totals=
-        movementSteps |> Seq.mapi(fun ii mv->
-            let samp4=totalMoves(mv)|>Seq.concat
-            let samp42D=array2D samp4
+    //         let origArrayCols=originalColumns|>Seq.take samp42D.[0,*].Length
+    //         let origHill=array2D origArrayCols
 
-            let origArrayCols=originalColumns|>Seq.take samp42D.[0,*].Length
-            let origHill=array2D origArrayCols
+    //         printfn "%s." (string (ii+1))
+    //         printHill(origHill)
+    //         printfn ""
+    //         printfn "         ---"
+    //         printfn ""
 
-            printfn "%s." (string (ii+1))
-            printHill(origHill)
-            printfn ""
-            printfn "         ---"
-            printfn ""
+    //         let fixedArray:int[,]=samp42D
+    //         printHill(fixedArray)
 
-            let fixedArray:int[,]=samp42D
-            printHill(fixedArray)
-
-            printfn ""
-            printfn "------------------------------"
-            let mop=samp42D |> Seq.cast<int>|>Seq.toArray
-            printfn "Solution %s Tree Count %A" (mv.ToString()) (mop.Length)
-            let bop=mop|>Array.filter(fun x->x=3)
-            printfn "Rows: %s Cols: %s" (string (fixedArray |> Array2D.length1)) (string (fixedArray |> Array2D.length2))
-            printfn "TOTAL TREES HIT %A" (bop.Length) // (boo |> Seq.length)
-            printfn "------------------------------"
-            printfn ""
-            bop.Length
-        ) |> Seq.toList
-    let grandTotal = totals |> List.sum
-    let grandMult = totals |> Seq.reduce(fun x y->x*y)
-    printfn ""
-    printfn "######################3"
-    printfn "TOTAL TREES %A" grandTotal
-    printfn "TOTAL PRODUCT OFTREES %A" grandMult
-    printfn "######################3"
-    printfn ""
+    //         printfn ""
+    //         printfn "------------------------------"
+    //         let mop=samp42D |> Seq.cast<int>|>Seq.toArray
+    //         printfn "Solution %s Tree Count %A" (mv.ToString()) (mop.Length)
+    //         let bop=mop|>Array.filter(fun x->x=3)
+    //         printfn "Rows: %s Cols: %s" (string (fixedArray |> Array2D.length1)) (string (fixedArray |> Array2D.length2))
+    //         printfn "TOTAL TREES HIT %A" (bop.Length) // (boo |> Seq.length)
+    //         printfn "------------------------------"
+    //         printfn ""
+    //         bop.Length
+    //     ) |> Seq.toList
+    // let grandTotal = totals |> List.sum
+    // let grandMult = totals |> Seq.reduce(fun x y->x*y)
+    // printfn ""
+    // printfn "######################3"
+    // printfn "TOTAL TREES %A" grandTotal
+    // printfn "TOTAL PRODUCT OFTREES %A" grandMult
+    // printfn "######################3"
+    // printfn ""
     let ts=stopWatch.Elapsed
     let elapsedTime =
         String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
