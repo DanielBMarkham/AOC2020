@@ -4,8 +4,8 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="TestData.fs" />
     <Compile Include="CoolUtils.fs" />
+    <Compile Include="TestData.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>
