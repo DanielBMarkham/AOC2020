@@ -24,7 +24,7 @@ let main argv =
             then seatingLoop newI n m
             else oldTotal
 
-    let equibSeatCount=seatingLoop 0 seats -1
+    let equibSeatCount=seatingLoop 0 part1Seats -1
     printfn "%A" equibSeatCount
 
 
