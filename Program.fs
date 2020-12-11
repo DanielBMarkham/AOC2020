@@ -20,13 +20,19 @@ stopWatch.Start()
 //
 
 
-
-
-
 [<EntryPoint>]
 let main argv =
     printfn "Advent of Code Puzzle Output"
     printfn "Day "
+
+    let printIfSumMatches (lis:array<'a>)=
+      if lis|>Array.sum=magicNumber
+        then printfn "%A" lis
+        else ()
+
+    let foo= m|>allContiguousSegments printIfSumMatches
+    //printM numArr
+//    ans m
 
 
     let ts=stopWatch.Elapsed
