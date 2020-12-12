@@ -55,3 +55,6 @@ let inline getRow r (A:_[,]) = flatten A.[r..r,*] |> Seq.toArray
 let rec repeat items =
   seq { yield! items
         yield! repeat items }
+
+
+let inline addTuple ((a,b):'a*'a) ((c,d):'a*'a)=(a+c,b+d)

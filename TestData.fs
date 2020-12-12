@@ -147,23 +147,35 @@ let showSeats (str:SeatType[,])=
       )
     printfn ""
     )
+let isOutOfBounds (x,y) l1 l2 (sts:SeatType[,])=
+  x<0 || y<0 || x>l1-1 || y>l2-1 || sts.[x,y]=Occupied
+let rec walkOutToBorderOrOccupied (sts:SeatType[,]) (pos:(int*int)) (movementDelta:(int*int)) (acc:(int*int) []) =
+  let l1=(sts |> Array2D.length1)
+  let l2=(sts |> Array2D.length2)
+  let newPos= addTuple pos movementDelta
+  if isOutOfBounds newPos l1 l2 sts
+    then
+      acc
+    else
+      let newPosArray:(int*int) array=Array.append<int*int> acc [|newPos|]
+      walkOutToBorderOrOccupied sts newPos movementDelta newPosArray
+
 let adjacentSeats x y (seatArray:SeatType[,]) =
   let getSeat(x,y)=
     let l1=(seatArray |> Array2D.length1)
     let l2=(seatArray |> Array2D.length2)
     if x<0 || y<0 || x>l1-1 || y>l2-1 then None else Some seatArray.[x,y]
 
-  let topLeft=getSeat(x-1,y-1)
-  let topCenter=getSeat(x,y-1)
-  let topRight=getSeat(x+1,y-1)
-  let lft=getSeat(x-1,y)
-  let rgt=getSeat(x+1,y)
-  let bottomLeft=getSeat(x-1,y+1)
-  let bottomCenter=getSeat(x,y+1)
-  let bottomRight=getSeat(x+1,y+1)
-  [|
-    topLeft;topCenter;topRight;lft;rgt;bottomLeft;bottomCenter;bottomRight
-  |] |> Array.choose id
+  let topLeft = walkOutToBorderOrOccupied seatArray (x,y) (-1,-1) Array.empty
+  let topCenter = walkOutToBorderOrOccupied seatArray (x,y) (0,-1) Array.empty
+  let topRight = walkOutToBorderOrOccupied seatArray (x,y) (1,-1) Array.empty
+  let lft=walkOutToBorderOrOccupied seatArray (x,y) (-1,0) Array.empty
+  let rgt=walkOutToBorderOrOccupied seatArray (x,y) (1,0) Array.empty
+  let bottomLeft=walkOutToBorderOrOccupied seatArray (x,y) (-1,1) Array.empty
+  let bottomCenter=walkOutToBorderOrOccupied seatArray (x,y) (0,1) Array.empty
+  let bottomRight=walkOutToBorderOrOccupied seatArray (x,y) (1,1) Array.empty
+
+  Array.concat [|topLeft;topCenter;topRight;lft;rgt;bottomLeft;bottomCenter;bottomRight|]
 
 
 let turnToTypedSeats (n:string[,]) =
@@ -185,11 +197,11 @@ let seatPeople(sts:SeatType[,])=
     sts
     |>Array2D.mapi(fun x y thisSeat->
       let seatsAroundMe = adjacentSeats x y sts
-      let totalRowCount=seatsAroundMe|>Seq.filter(fun z->z=Occupied)|>Seq.length
+      let totalRowCount=seatsAroundMe|>Seq.filter(fun z->sts.[fst z,snd z]=Occupied)|>Seq.length
       let newSeat=
         match sts.[x,y] with
           |Empty when totalRowCount=0->Occupied
-          |Occupied when totalRowCount>3->Empty
+          |Occupied when totalRowCount>4->Empty
           |_->sts.[x,y]
       newSeat
     )
