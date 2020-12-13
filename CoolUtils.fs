@@ -49,12 +49,34 @@ let flipArray(arr):'A[,]= Array2D.init (arr |> Array2D.length2) (arr |> Array2D.
 let inline flatten (A:'a[,]) = A |> Seq.cast<'a>
 let inline getColumn c (A:_[,]) = flatten A.[*,c..c] |> Seq.toArray
 let inline getRow r (A:_[,]) = flatten A.[r..r,*] |> Seq.toArray
-///
-/// Many thanks to Tomas Petricek posting code on SO
-///
+
 let rec repeat items =
   seq { yield! items
         yield! repeat items }
 
 
 let inline addTuple ((a,b):'a*'a) ((c,d):'a*'a)=(a+c,b+d)
+
+let neighbors r c (A:'a[,]) =
+    [
+    let l1=Array2D.length1 A
+    let l2=Array2D.length2 A
+    let sz=(l1,l2)
+    if sz<>(0,0) && sz<>(1,0) && sz<>(0,1) then
+      if r > 0 then yield A.[r-1,c]
+      if r < Array2D.length1 A - 1 then yield A.[r+1,c]
+      if c > 0 then yield A.[r,c-1]
+      if c < Array2D.length2 A - 1 then yield A.[r,c+1]]
+
+
+let jumpBy r c deltaRow deltaCol (A:'a[,]) =
+    [
+    let l1=Array2D.length1 A
+    let l2=Array2D.length2 A
+    let sz=(l1,l2)
+    let newRow=r+deltaRow
+    let newCol=deltaCol
+    //if sz<>(0,0) && sz<>(1,0) && sz<>(0,1) then
+    if newRow >= 0 && newRow < Array2D.length1 A - 1 && newCol >=0 && newCol < Array2D.length2 A  then yield A.[newRow,newCol]]
+    
+

@@ -123,60 +123,43 @@ let part1Data= array2D [|
 
 
 
-
+let frameSize= // (20,20)
+  (part1Data|>Array2D.length1,part1Data|>Array2D.length2)
 
 type SeatType =
   |Empty
   |Occupied
   |Floor
-let typeToLetter (s:SeatType)=
+let typeToChar (s:SeatType)=
   match s
     with
-    |Empty->"L"
-    |Occupied->"#"
-    |Floor->"."
+    |Empty->'L'
+    |Occupied->'#'
+    |Floor->'.'
 let showSeats (str:SeatType[,])=
   [0..((str |>Array2D.length1)-1)]
   |> List.iter(fun x->
-    let row:SeatType array=str.[x,0..]
+    let row:SeatType array=(str.[x,0..])
     row
     |>Array.iter(fun (y:SeatType)->
-        let ltr=(typeToLetter y)
-        printf "%s" ltr
+        let chr=(typeToChar y)
+        printf "%c" chr
         ()
       )
     printfn ""
     )
-let isOutOfBounds (x,y) l1 l2 (sts:SeatType[,])=
-  x<0 || y<0 || x>l1-1 || y>l2-1 || sts.[x,y]=Occupied
-let rec walkOutToBorderOrOccupied (sts:SeatType[,]) (pos:(int*int)) (movementDelta:(int*int)) (acc:(int*int) []) =
-  let l1=(sts |> Array2D.length1)
-  let l2=(sts |> Array2D.length2)
-  let newPos= addTuple pos movementDelta
-  if isOutOfBounds newPos l1 l2 sts
-    then
-      acc
-    else
-      let newPosArray:(int*int) array=Array.append<int*int> acc [|newPos|]
-      walkOutToBorderOrOccupied sts newPos movementDelta newPosArray
-
-let adjacentSeats x y (seatArray:SeatType[,]) =
-  let getSeat(x,y)=
-    let l1=(seatArray |> Array2D.length1)
-    let l2=(seatArray |> Array2D.length2)
-    if x<0 || y<0 || x>l1-1 || y>l2-1 then None else Some seatArray.[x,y]
-
-  let topLeft = walkOutToBorderOrOccupied seatArray (x,y) (-1,-1) Array.empty
-  let topCenter = walkOutToBorderOrOccupied seatArray (x,y) (0,-1) Array.empty
-  let topRight = walkOutToBorderOrOccupied seatArray (x,y) (1,-1) Array.empty
-  let lft=walkOutToBorderOrOccupied seatArray (x,y) (-1,0) Array.empty
-  let rgt=walkOutToBorderOrOccupied seatArray (x,y) (1,0) Array.empty
-  let bottomLeft=walkOutToBorderOrOccupied seatArray (x,y) (-1,1) Array.empty
-  let bottomCenter=walkOutToBorderOrOccupied seatArray (x,y) (0,1) Array.empty
-  let bottomRight=walkOutToBorderOrOccupied seatArray (x,y) (1,1) Array.empty
-
-  Array.concat [|topLeft;topCenter;topRight;lft;rgt;bottomLeft;bottomCenter;bottomRight|]
-
+let cellsFromHereToTheBorderOmni<'a> row col (arr:'a[,]) =
+  let topLeft=jumpBy row col -1 -1 arr |> Seq.toList
+  let topCenter= jumpBy row col -1 0 arr |> Seq.toList
+  let topRight =jumpBy row col -1 1 arr |> Seq.toList
+  let lft = jumpBy row col 0 -1 arr |> Seq.toList
+  let rgt = jumpBy row col 0 1 arr |> Seq.toList
+  let bottomLeft= jumpBy row col 1 -1 arr |> Seq.toList
+  let bottomCenter=jumpBy row col 1 0 arr |> Seq.toList
+  let bottomRight=jumpBy row col 1 1 arr |> Seq.toList
+  let s= [|topLeft;topCenter;topRight;lft;rgt;bottomLeft;bottomCenter;bottomRight|]
+  let t=List.concat s
+  t
 
 let turnToTypedSeats (n:string[,]) =
   n
@@ -188,21 +171,28 @@ let turnToTypedSeats (n:string[,]) =
       |_->Floor
     )
 
-let seats=turnToTypedSeats stringSeats
-let part1Seats=turnToTypedSeats part1Data
-
+let seats=turnToTypedSeats stringSeats //stringSeats
+// let part1Seats=
+//   let nog=(turnToTypedSeats stringSeats).[0..fst frameSize,0..snd frameSize]
+//   //printfn "%A" nog
+//   nog
 
 let seatPeople(sts:SeatType[,])=
   let ret=
     sts
-    |>Array2D.mapi(fun x y thisSeat->
-      let seatsAroundMe = adjacentSeats x y sts
-      let totalRowCount=seatsAroundMe|>Seq.filter(fun z->sts.[fst z,snd z]=Occupied)|>Seq.length
+    |>Array2D.mapi(fun row col thisSeat->
+      let firsPeopleOrEmptySeatsICanSeeInAnyDirection = cellsFromHereToTheBorderOmni<SeatType> row col sts
+      let peopleICanSeeCount=firsPeopleOrEmptySeatsICanSeeInAnyDirection|>List.filter(fun x->x=Occupied) |> List.length
+      let peopleDirectlyAdjacentToMe =
+        neighbors row col sts
+        |> Seq.toArray
+        |> Array.filter(fun x->x=Occupied)
+      let peopleAdjacentToMeCount = peopleDirectlyAdjacentToMe.Length
       let newSeat=
-        match sts.[x,y] with
-          |Empty when totalRowCount=0->Occupied
-          |Occupied when totalRowCount>4->Empty
-          |_->sts.[x,y]
+        match sts.[row,col] with
+          |Empty when peopleAdjacentToMeCount=0->Occupied
+          |Occupied when peopleICanSeeCount>4->Empty
+          |_->sts.[row,col]
       newSeat
     )
   ret

@@ -16,17 +16,17 @@ let main argv =
     let rec seatingLoop i sts oldTotal =
         let newI=i+1
         if i>Int32.MaxValue then failwith "i too big" else ()
-        showSeats sts
-        printfn ""
         let n=seatPeople(sts)
+        printfn ""
+        showSeats n
         let m=n|>Seq.cast<SeatType>|>Seq.filter(fun x->x=Occupied) |> Seq.length
         if oldTotal<>m
             then seatingLoop newI n m
-            else oldTotal
-
-    let equibSeatCount=seatingLoop 0 part1Seats -1
+            else m
+    let equibSeatCount=seatingLoop 0 seats -1
+    printfn ""
+    printfn ""
     printfn "%A" equibSeatCount
-
 
     let ts=stopWatch.Elapsed
     let elapsedTime =
