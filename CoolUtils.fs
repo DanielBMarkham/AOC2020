@@ -1,5 +1,5 @@
 module CoolUtils
-
+open System.Collections.Generic
 
 let doesRuleMatchPart1 (minCount:int, maxCount:int,character:char,stringToTest:string) =
     let matchCount=(stringToTest|>String.filter(fun x->x=character)).Length
@@ -59,24 +59,53 @@ let inline addTuple ((a,b):'a*'a) ((c,d):'a*'a)=(a+c,b+d)
 
 let neighbors r c (A:'a[,]) =
     [
-    let l1=Array2D.length1 A
-    let l2=Array2D.length2 A
-    let sz=(l1,l2)
-    if sz<>(0,0) && sz<>(1,0) && sz<>(0,1) then
-      if r > 0 then yield A.[r-1,c]
-      if r < Array2D.length1 A - 1 then yield A.[r+1,c]
-      if c > 0 then yield A.[r,c-1]
-      if c < Array2D.length2 A - 1 then yield A.[r,c+1]]
-
+    let rowLength:int=Array2D.length1 A - 1
+    let colLength:int=Array2D.length2 A - 1
+    let inline inbounds(r,c) = (r>(-1)) && (c>(-1)) && (r<=rowLength) && (c<=colLength)
+    let neighborArr=[|(-1,-1);(-1,0);(-1,1);(0,-1);(0,1);(1,-1);(1,0);(1,1)|]
+    let validNeighborOffsets=neighborArr|>Array.filter(fun x->inbounds (addTuple (r,c) x) )
+    let validNeighbors = validNeighborOffsets|>Array.map(fun (a,b)->
+      let r2=a+r
+      let c2=b+c
+      A.[r2,c2])
+    yield! validNeighbors]
 
 let jumpBy r c deltaRow deltaCol (A:'a[,]) =
     [
-    let l1=Array2D.length1 A
-    let l2=Array2D.length2 A
-    let sz=(l1,l2)
-    let newRow=r+deltaRow
-    let newCol=deltaCol
-    //if sz<>(0,0) && sz<>(1,0) && sz<>(0,1) then
-    if newRow >= 0 && newRow < Array2D.length1 A - 1 && newCol >=0 && newCol < Array2D.length2 A  then yield A.[newRow,newCol]]
-    
+    if not (deltaRow=0 && deltaCol=0) then
+      let rowLength:int=Array2D.length1 A - 1
+      let colLength:int=Array2D.length2 A - 1
+      let inline inbounds(checkRow,checkCol) = (checkRow>(-1)) && (checkCol>(-1)) && (checkRow<=rowLength) && (checkCol<=colLength)
+      let rec validJumps testRow testCol acc =
+        let newRow=testRow+deltaRow
+        let newCol=testCol+deltaCol
+        if inbounds(newRow,newCol)
+          then
+            let newAcc=Array.append acc [|(newRow,newCol)|]
+            if inbounds(newRow+deltaRow,newCol+deltaCol)=true
+              then (validJumps newRow newCol newAcc)
+              else newAcc
+          else acc
+      let validSpots=validJumps r c [||]
+      let valids=validSpots|>Array.map(fun (a,b)->
+        A.[a,b])
+      yield! valids
+      ]
+
+
+/// Takes while predicate is false. Takes first item where predicate is true
+let takeUntil predicate (s:seq<_>) =
+  /// Iterates over the enumerator, yielding elements and
+  /// stops after an element for which the predicate does not hold
+  let rec loop (en:IEnumerator<_>) = seq {
+    if en.MoveNext() then
+      // Always yield the current, stop if predicate does not hold
+      yield en.Current
+      if predicate en.Current then
+        yield! loop en }
+
+  // Get enumerator of the sequence and yield all results
+  // (making sure that the enumerator gets disposed)
+  seq { use en = s.GetEnumerator()
+        yield! loop en }
 

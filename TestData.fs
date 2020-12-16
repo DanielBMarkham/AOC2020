@@ -18,6 +18,100 @@ let stringSeats=array2D [|
 
 
 
+
+
+let iteration1=
+  array2D [|
+  [|"#";".";"#";"#";".";"#";"#";".";"#";"#"|]
+  ;[|"#";"#";"#";"#";"#";"#";"#";".";"#";"#"|]
+  ;[|"#";".";"#";".";"#";".";".";"#";".";"."|]
+  ;[|"#";"#";"#";"#";".";"#";"#";".";"#";"#"|]
+  ;[|"#";".";"#";"#";".";"#";"#";".";"#";"#"|]
+  ;[|"#";".";"#";"#";"#";"#";"#";".";"#";"#"|]
+  ;[|".";".";"#";".";"#";".";".";".";".";"."|]
+  ;[|"#";"#";"#";"#";"#";"#";"#";"#";"#";"#"|]
+  ;[|"#";".";"#";"#";"#";"#";"#";"#";".";"#"|]
+  ;[|"#";".";"#";"#";"#";"#";"#";".";"#";"#"|]
+  |]
+
+let iteration2=
+  array2D [|
+  [|"#";".";"L";"L";".";"L";"L";".";"L";"#"|]
+  ;[|"#";"L";"L";"L";"L";"L";"L";".";"L";"L"|]
+  ;[|"L";".";"L";".";"L";".";".";"L";".";"."|]
+  ;[|"L";"L";"L";"L";".";"L";"L";".";"L";"L"|]
+  ;[|"L";".";"L";"L";".";"L";"L";".";"L";"L"|]
+  ;[|"L";".";"L";"L";"L";"L";"L";".";"L";"L"|]
+  ;[|".";".";"L";".";"L";".";".";".";".";"."|]
+  ;[|"L";"L";"L";"L";"L";"L";"L";"L";"L";"#"|]
+  ;[|"#";".";"L";"L";"L";"L";"L";"L";".";"L"|]
+  ;[|"#";".";"L";"L";"L";"L";"L";".";"L";"#"|]
+  |]
+
+let iteration3=
+  array2D [|
+  [|"#";".";"L";"#";".";"#";"#";".";"L";"#"|]
+  ;[|"#";"L";"#";"#";"#";"#";"#";".";"L";"L"|]
+  ;[|"L";".";"#";".";"#";".";".";"#";".";"."|]
+  ;[|"#";"#";"L";"#";".";"#";"#";".";"#";"#"|]
+  ;[|"#";".";"#";"#";".";"#";"L";".";"#";"#"|]
+  ;[|"#";".";"#";"#";"#";"#";"#";".";"#";"L"|]
+  ;[|".";".";"#";".";"#";".";".";".";".";"."|]
+  ;[|"L";"L";"L";"#";"#";"#";"#";"L";"L";"#"|]
+  ;[|"#";".";"L";"#";"#";"#";"#";"#";".";"L"|]
+  ;[|"#";".";"L";"#";"#";"#";"#";".";"L";"#"|]
+  |]
+
+let iteration4=
+  array2D [|
+  [|"#";".";"L";"#";".";"L";"#";".";"L";"#"|]
+  ;[|"#";"L";"L";"L";"L";"L";"L";".";"L";"L"|]
+  ;[|"L";".";"L";".";"L";".";".";"#";".";"."|]
+  ;[|"#";"#";"L";"L";".";"L";"L";".";"L";"#"|]
+  ;[|"L";".";"L";"L";".";"L";"L";".";"L";"#"|]
+  ;[|"#";".";"L";"L";"L";"L";"L";".";"L";"L"|]
+  ;[|".";".";"L";".";"L";".";".";".";".";"."|]
+  ;[|"L";"L";"L";"L";"L";"L";"L";"L";"L";"#"|]
+  ;[|"#";".";"L";"L";"L";"L";"L";"#";".";"L"|]
+  ;[|"#";".";"L";"#";"L";"L";"#";".";"L";"#"|]
+  |]
+
+let iteration5=
+  array2D [|
+  [|"#";".";"L";"#";".";"L";"#";".";"L";"#"|]
+  ;[|"#";"L";"L";"L";"L";"L";"L";".";"L";"L"|]
+  ;[|"L";".";"L";".";"L";".";".";"#";".";"."|]
+  ;[|"#";"#";"L";"#";".";"#";"L";".";"L";"#"|]
+  ;[|"L";".";"L";"#";".";"#";"L";".";"L";"#"|]
+  ;[|"#";".";"L";"#";"#";"#";"#";".";"L";"L"|]
+  ;[|".";".";"#";".";"#";".";".";".";".";"."|]
+  ;[|"L";"L";"L";"#";"#";"#";"L";"L";"L";"#"|]
+  ;[|"#";".";"L";"L";"L";"L";"L";"#";".";"L"|]
+  ;[|"#";".";"L";"#";"L";"L";"#";".";"L";"#"|]
+  |]
+
+let iteration6=
+  array2D [|
+  [|"#";".";"L";"#";".";"L";"#";".";"L";"#"|]
+  ;[|"#";"L";"L";"L";"L";"L";"L";".";"L";"L"|]
+  ;[|"L";".";"L";".";"L";".";".";"#";".";"."|]
+  ;[|"#";"#";"L";"#";".";"#";"L";".";"L";"#"|]
+  ;[|"L";".";"L";"#";".";"L";"L";".";"L";"#"|]
+  ;[|"#";".";"L";"L";"L";"L";"#";".";"L";"L"|]
+  ;[|".";".";"#";".";"L";".";".";".";".";"."|]
+  ;[|"L";"L";"L";"#";"#";"#";"L";"L";"L";"#"|]
+  ;[|"#";".";"L";"L";"L";"L";"L";"#";".";"L"|]
+  ;[|"#";".";"L";"#";"L";"L";"#";".";"L";"#"|]
+  |]
+
+
+
+
+
+
+
+
+
 let part1Data= array2D [|
   [|"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";".";".";".";"L";"L";"L";".";"L";"L";"L";"L";"L";"L";"L";"L";"L";".";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";".";"L";"L";"L";"L";"L";"L";"L";"L";".";"L";"L";"L";".";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";".";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L"|]
   [|"L";"L";"L";"L";"L";"L";".";"L";"L";"L";"L";"L";"L";"L";"L";".";"L";".";"L";"L";".";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";".";".";"L";"L";"L";"L";"L";"L";"L";"L";"L";".";"L";"L";"L";"L";"L";"L";"L";".";"L";"L";"L";"L";"L";"L";"L";".";"L";"L";"L";"L";"L";".";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";"L";".";"L";"L"|]
@@ -148,18 +242,17 @@ let showSeats (str:SeatType[,])=
       )
     printfn ""
     )
-let cellsFromHereToTheBorderOmni<'a> row col (arr:'a[,]) =
-  let topLeft=jumpBy row col -1 -1 arr |> Seq.toList
-  let topCenter= jumpBy row col -1 0 arr |> Seq.toList
-  let topRight =jumpBy row col -1 1 arr |> Seq.toList
-  let lft = jumpBy row col 0 -1 arr |> Seq.toList
-  let rgt = jumpBy row col 0 1 arr |> Seq.toList
-  let bottomLeft= jumpBy row col 1 -1 arr |> Seq.toList
-  let bottomCenter=jumpBy row col 1 0 arr |> Seq.toList
-  let bottomRight=jumpBy row col 1 1 arr |> Seq.toList
+let cellsFromHereToTheBorderOrFirstSeat row col arr =
+  let topLeft=jumpBy row col -1 -1 arr |> takeUntil (fun x->x<>Occupied && x<>Empty) |> Seq.toList
+  let topCenter= jumpBy row col -1 0 arr |> takeUntil (fun x->x<>Occupied && x<>Empty) |> Seq.toList
+  let topRight =jumpBy row col -1 1 arr |> takeUntil (fun x->x<>Occupied && x<>Empty) |> Seq.toList
+  let lft = jumpBy row col 0 -1 arr |> takeUntil (fun x->x<>Occupied && x<>Empty) |> Seq.toList
+  let rgt = jumpBy row col 0 1 arr |> takeUntil (fun x->x<>Occupied && x<>Empty) |> Seq.toList
+  let bottomLeft= jumpBy row col 1 -1 arr |> takeUntil (fun x->x<>Occupied && x<>Empty) |> Seq.toList
+  let bottomCenter=jumpBy row col 1 0 arr |> takeUntil (fun x->x<>Occupied && x<>Empty) |> Seq.toList
+  let bottomRight=jumpBy row col 1 1 arr |> takeUntil (fun x->x<>Occupied && x<>Empty) |> Seq.toList
   let s= [|topLeft;topCenter;topRight;lft;rgt;bottomLeft;bottomCenter;bottomRight|]
-  let t=List.concat s
-  t
+  s
 
 let turnToTypedSeats (n:string[,]) =
   n
@@ -171,17 +264,16 @@ let turnToTypedSeats (n:string[,]) =
       |_->Floor
     )
 
-let seats=turnToTypedSeats stringSeats //stringSeats
-// let part1Seats=
-//   let nog=(turnToTypedSeats stringSeats).[0..fst frameSize,0..snd frameSize]
-//   //printfn "%A" nog
-//   nog
+let seats=turnToTypedSeats  part1Data// stringSeats //stringSeats
 
 let seatPeople(sts:SeatType[,])=
   let ret=
     sts
     |>Array2D.mapi(fun row col thisSeat->
-      let firsPeopleOrEmptySeatsICanSeeInAnyDirection = cellsFromHereToTheBorderOmni<SeatType> row col sts
+      let firsPeopleOrEmptySeatsICanSeeInAnyDirection =
+        let v=(cellsFromHereToTheBorderOrFirstSeat row col sts)
+        let t=List.concat v
+        t
       let peopleICanSeeCount=firsPeopleOrEmptySeatsICanSeeInAnyDirection|>List.filter(fun x->x=Occupied) |> List.length
       let peopleDirectlyAdjacentToMe =
         neighbors row col sts
@@ -190,7 +282,7 @@ let seatPeople(sts:SeatType[,])=
       let peopleAdjacentToMeCount = peopleDirectlyAdjacentToMe.Length
       let newSeat=
         match sts.[row,col] with
-          |Empty when peopleAdjacentToMeCount=0->Occupied
+          |Empty when peopleICanSeeCount=0->Occupied
           |Occupied when peopleICanSeeCount>4->Empty
           |_->sts.[row,col]
       newSeat
