@@ -44,6 +44,33 @@ type 'a ``[,]`` with
     yield! validNeighbors]
 
 
+
+  member self.JumpBy r c deltaRow deltaCol =
+    [
+      if not (deltaRow=0 && deltaCol=0) then
+        let rowLength:int=Array2D.length1 self - 1
+        let colLength:int=Array2D.length2 self - 1
+        let inline inbounds(checkRow,checkCol) = (checkRow>(-1)) && (checkCol>(-1)) && (checkRow<=rowLength) && (checkCol<=colLength)
+        let rec validJumps testRow testCol acc =
+          let newRow=testRow+deltaRow
+          let newCol=testCol+deltaCol
+          if inbounds(newRow,newCol)
+            then
+              let newAcc=Array.append acc [|(newRow,newCol)|]
+              if inbounds(newRow+deltaRow,newCol+deltaCol)
+                then (validJumps newRow newCol newAcc)
+                else newAcc
+            else acc
+        let validSpots=validJumps r c [||]
+        let valids=validSpots|>Array.map(fun (a,b)->
+          self.[a,b])
+        yield! valids
+    ]
+
+let rec repeat items =
+  seq { yield! items
+        yield! repeat items }
+
 let crossProduct l1 l2=
   [|  for el1 in l1 do
       for el2 in l2 do
@@ -55,12 +82,10 @@ let crossproduct l1 l2 =
             yield el1, el2 };;
 
 
-
 let crossproductNoSameExact l1 l2 =
   crossproduct l1 l2 |> Seq.filter(fun x->fst x<>snd x)
 let crossproductNoSameAnyPairOrder l1 l2 =
   crossproduct l1 l2 |> Seq.filter(fun x->fst x<>snd x)|>Seq.map orderPair |> Seq.distinct
-
 
 
 let doesRuleMatchPart1 (minCount:int, maxCount:int,character:char,stringToTest:string) =
@@ -70,8 +95,6 @@ let doesRuleMatch (firstIndex:int, secondIndex:int,character:char,stringToTest:s
     try
         (stringToTest.[firstIndex-1]=character)<>(stringToTest.[secondIndex-1 ]=character)
     with |_->false
-
-
 
 
 let allContiguousSegments (f:array<'a>->unit) (incomingSequence:array<'a>)  =
@@ -93,11 +116,6 @@ let flipArray(arr):'A[,]= Array2D.init (arr |> Array2D.length2) (arr |> Array2D.
 let inline flatten (A:'a[,]) = A |> Seq.cast<'a>
 let inline getColumn c (A:_[,]) = flatten A.[*,c..c] |> Seq.toArray
 let inline getRow r (A:_[,]) = flatten A.[r..r,*] |> Seq.toArray
-
-let rec repeat items =
-  seq { yield! items
-        yield! repeat items }
-
 
 
 //let inline (+) ((a,b):'a*'a) ((c,d):'a*'a):('a*'a) = (a+b,c+d)
